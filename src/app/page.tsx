@@ -226,14 +226,17 @@ export default async function HomePage() {
 
       {/* 푸터 */}
       <footer className="bg-gray-900 text-gray-400 mt-12">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid md:grid-cols-4 gap-8">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="text-2xl font-bold text-white mb-4">
                 <span className="text-teal-400">aimeta</span><span>edu</span>
               </div>
-              <p className="text-sm">
+              <p className="text-sm mb-4">
                 AI 시대의 교육 뉴스
+              </p>
+              <p className="text-xs text-gray-500">
+                운영: 주식회사 스마택트
               </p>
             </div>
             <div>
@@ -249,23 +252,26 @@ export default async function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">소개</h4>
-              <ul className="text-sm space-y-2">
-                <li><Link href="#" className="hover:text-white">회사 소개</Link></li>
-                <li><Link href="#" className="hover:text-white">광고 문의</Link></li>
-                <li><Link href="#" className="hover:text-white">파트너십</Link></li>
+              <h4 className="text-white font-bold mb-4">회사 정보</h4>
+              <ul className="text-xs space-y-2">
+                <li>대표자: 조진영</li>
+                <li>경기도 시흥시 비둘기공원 7길 39, 에이동 206호</li>
+                <li>통신판매: 2023-경기시흥-1413</li>
+                <li>경기형 예비사회적기업: 경기 제 2023-074호</li>
+                <li>사업자등록: 582-88-02696</li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-bold mb-4">문의</h4>
-              <ul className="text-sm space-y-2">
-                <li>contact@aimetaedu.com</li>
-                <li>카카오톡: @aimetaedu</li>
+              <ul className="text-xs space-y-2">
+                <li>📧 info@smartact.co.kr</li>
+                <li>💬 카카오톡: 스마택트연구소</li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
             <p>© 2026 aimetaedu. All rights reserved.</p>
+            <p className="mt-2 md:mt-0">개인정보관리책임자: 조진영</p>
           </div>
         </div>
       </footer>
