@@ -78,7 +78,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
-                href={`/category/${cat.slug}`}
+                href={cat.slug === '' ? '/' : `/category/${cat.slug}`}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   categorySlug === cat.slug
                     ? 'bg-teal-600 text-white'
