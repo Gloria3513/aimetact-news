@@ -25,9 +25,9 @@ const categories = [
   { slug: '인터뷰', name: '인터뷰' },
 ]
 
-export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CategoryPage({ params }: { params: Promise<{ slug?: string }> }) {
   const { slug } = await params
-  const categorySlug = decodeURIComponent(slug)
+  const categorySlug = slug ? decodeURIComponent(slug) : ''
   const categoryName = categories.find(c => c.slug === categorySlug)?.name || '전체'
 
   // 기사 가져오기
