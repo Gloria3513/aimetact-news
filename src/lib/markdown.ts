@@ -4,7 +4,7 @@
 
 import React from 'react'
 
-export function renderMarkdown(content: string): JSX.Element {
+export function renderMarkdown(content: string): React.ReactNode {
   const lines = content.split('\n')
   const result: React.ReactNode[] = []
   let currentList: string[] = []
