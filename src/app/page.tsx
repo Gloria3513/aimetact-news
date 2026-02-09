@@ -1,65 +1,38 @@
 import Link from 'next/link'
+import { getArticles, getPopularArticles } from '@/lib/articles'
 
-export default function HomePage() {
-  // 샘플 뉴스 데이터
-  const news = [
-    {
-      id: 1,
-      category: 'AI교육',
-      title: 'AI 시대, 유치원 선생님이 알아야 할 5가지',
-      summary: '생성형 AI가 유아 교육에 미치는 영향과 활용 방법',
-      author: '김지현',
-      date: '2026.02.05',
-      readTime: '5분',
-    },
-    {
-      id: 2,
-      category: '정책',
-      title: '교육부, 2025년 유치원 AI 교육 지원 확대',
-      summary: '정부가 발표한 새로운 AI 교육 지원 정책의 핵심 내용',
-      author: '박민수',
-      date: '2026.02.04',
-      readTime: '3분',
-    },
-    {
-      id: 3,
-      category: '유치원',
-      title: '경기 유치원 "AI 활용해서 부모 신뢰 얻어요"',
-      summary: '실제 현장에서 AI를 활용해 소통을 개선한 사례',
-      author: '이수진',
-      date: '2026.02.03',
-      readTime: '4분',
-    },
-    {
-      id: 4,
-      category: '학부모',
-      title: '우리 아이 AI 교육, 어디서부터 시작할까요?',
-      summary: '초보 학부모를 위한 AI 교육 가이드',
-      author: '정유미',
-      date: '2026.02.02',
-      readTime: '6분',
-    },
-    {
-      id: 5,
-      category: '인터뷰',
-      title: '[인터뷰] AI 교육 선구자 원장님의 이야기',
-      summary: '경기의 한 유치원에서 시작된 AI 교육 혁신',
-      author: '편집부',
-      date: '2026.02.01',
-      readTime: '8분',
-    },
-    {
-      id: 6,
-      category: 'AI교육',
-      title: '프롬프트 공부의 정석, 전문가가 알려줘요',
-      summary: '효율적인 AI 활용을 위한 프롬프트 작성법',
-      author: '최현우',
-      date: '2026.01.31',
-      readTime: '7분',
-    },
-  ]
+// 날짜 포맷 함수
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.')
+}
+
+// 읽기 시간 계산
+function calcReadTime(content: string): string {
+  const wordsPerMinute = 500
+  const wordCount = content.length
+  const minutes = Math.ceil(wordCount / wordsPerMinute)
+  return `${minutes}분`
+}
+
+export default async function HomePage() {
+  // DB에서 기사 가져오기
+  const articles = await getArticles({ published: true })
+  const popularArticles = await getPopularArticles(5)
 
   const categories = ['전체', 'AI교육', '정책', '유치원', '학부모', '인터뷰']
+
+  // 데이터가 없으면 안내 메시지
+  if (articles.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">아직 등록된 기사가 없습니다</h1>
+          <p className="text-gray-600">관리자 페이지에서 첫 기사를 작성해주세요</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -89,16 +62,17 @@ export default function HomePage() {
 
             {/* 검색 */}
             <div className="flex items-center gap-3">
-              <div className="relative">
+              <Link href="/search" className="relative">
                 <input
                   type="search"
                   placeholder="기사 검색..."
-                  className="pl-4 pr-10 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  readOnly
+                  className="pl-4 pr-10 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer"
                 />
-                <svg className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              </div>
+              </Link>
               <button className="md:hidden">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -115,7 +89,7 @@ export default function HomePage() {
           {/* 메인 기사 */}
           <div className="lg:col-span-2">
             {/* 헤드라인 기사 */}
-            <Link href={`/article/${news[0].id}`} className="block mb-8">
+            <Link href={`/article/${articles[0].id}`} className="block mb-8">
               <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="aspect-video bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-teal-700 to-teal-900 opacity-80"></div>
@@ -130,18 +104,18 @@ export default function HomePage() {
                 </div>
                 <div className="p-6">
                   <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold mb-3">
-                    {news[0].category}
+                    {articles[0].category}
                   </span>
                   <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-teal-600 transition-colors">
-                    {news[0].title}
+                    {articles[0].title}
                   </h2>
-                  <p className="text-gray-600 mb-4">{news[0].summary}</p>
+                  <p className="text-gray-600 mb-4">{articles[0].summary}</p>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>{news[0].author}</span>
+                    <span>{articles[0].author}</span>
                     <span>•</span>
-                    <span>{news[0].date}</span>
+                    <span>{formatDate(articles[0].created_at)}</span>
                     <span>•</span>
-                    <span>{news[0].readTime}</span>
+                    <span>{calcReadTime(articles[0].content)}</span>
                   </div>
                 </div>
               </article>
@@ -149,7 +123,7 @@ export default function HomePage() {
 
             {/* 서브 기사들 */}
             <div className="grid md:grid-cols-2 gap-6">
-              {news.slice(1).map((item) => (
+              {articles.slice(1).map((item) => (
                 <Link key={item.id} href={`/article/${item.id}`} className="block">
                   <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative overflow-hidden">
@@ -164,9 +138,9 @@ export default function HomePage() {
                         {item.title}
                       </h3>
                       <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span>{item.date}</span>
+                        <span>{formatDate(item.created_at)}</span>
                         <span>•</span>
-                        <span>{item.readTime}</span>
+                        <span>{calcReadTime(item.content)}</span>
                       </div>
                     </div>
                   </article>
@@ -186,7 +160,7 @@ export default function HomePage() {
                 인기 기사
               </h3>
               <div className="space-y-4">
-                {news.slice(0, 5).map((item, idx) => (
+                {popularArticles.map((item, idx) => (
                   <Link key={item.id} href={`/article/${item.id}`} className="block group">
                     <div className="flex gap-3">
                       <span className="text-2xl font-bold text-gray-300 group-hover:text-teal-600 transition-colors">{idx + 1}</span>
@@ -209,14 +183,7 @@ export default function HomePage() {
               <p className="text-teal-100 text-sm mb-4 relative">
                 최신 교육 소식을 매일 아침 메일로 받아보세요
               </p>
-              <input
-                type="email"
-                placeholder="이메일 주소"
-                className="w-full px-4 py-2 rounded-lg text-gray-900 text-sm mb-2"
-              />
-              <button className="w-full bg-white text-teal-700 font-semibold py-2 rounded-lg hover:bg-teal-50 transition-colors relative">
-                구독하기
-              </button>
+              <NewsletterForm />
             </div>
 
             {/* 스마택트 배너 */}
@@ -253,10 +220,13 @@ export default function HomePage() {
             <div>
               <h4 className="text-white font-bold mb-4">카테고리</h4>
               <ul className="text-sm space-y-2">
-                <li><Link href="#" className="hover:text-white">AI교육</Link></li>
-                <li><Link href="#" className="hover:text-white">정책</Link></li>
-                <li><Link href="#" className="hover:text-white">유치원</Link></li>
-                <li><Link href="#" className="hover:text-white">학부모</Link></li>
+                {categories.slice(1).map((cat) => (
+                  <li key={cat}>
+                    <Link href={`/category/${cat}`} className="hover:text-white">
+                      {cat}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
@@ -283,3 +253,6 @@ export default function HomePage() {
     </div>
   )
 }
+
+// 뉴스레터 폼 컴포넌트
+import NewsletterForm from '@/components/NewsletterForm'
