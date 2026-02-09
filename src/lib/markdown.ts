@@ -4,7 +4,7 @@
 
 import React from 'react'
 
-export function renderMarkdown(content: string): React.ReactNode {
+export function renderMarkdown(content: string): React.ReactElement {
   const lines = content.split('\n')
   const result: React.ReactNode[] = []
   let currentList: string[] = []
@@ -23,8 +23,8 @@ export function renderMarkdown(content: string): React.ReactNode {
     }
   }
 
-  lines.forEach((line, idx) => {
-    const trimmed = line.trim()
+  for (let idx = 0; idx < lines.length; idx++) {
+    const trimmed = lines[idx].trim()
 
     // 제목 처리
     if (trimmed.startsWith('#')) {
@@ -43,14 +43,14 @@ export function renderMarkdown(content: string): React.ReactNode {
 
         result.push(<Tag key={idx} className={className}>{text}</Tag>)
       }
-      return
+      continue
     }
 
     // 리스트 처리
     if (trimmed.startsWith('- ')) {
       inList = true
       currentList.push(trimmed.substring(2))
-      return
+      continue
     }
 
     // 숫자 리스트
@@ -60,7 +60,7 @@ export function renderMarkdown(content: string): React.ReactNode {
       if (match) {
         result.push(<ol key={idx} className="ml-4 list-decimal text-gray-700 space-y-1 my-4"><li>{match[1]}</li></ol>)
       }
-      return
+      continue
     }
 
     // 빈 줄
@@ -71,13 +71,13 @@ export function renderMarkdown(content: string): React.ReactNode {
       } else {
         result.push(<br key={idx} />)
       }
-      return
+      continue
     }
 
     // 본문
     flushList()
     result.push(<p key={idx} className="text-gray-700 leading-relaxed my-4">{trimmed}</p>)
-  })
+  }
 
   // 남은 리스트 플러시
   flushList()
