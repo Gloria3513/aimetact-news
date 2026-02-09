@@ -5,9 +5,10 @@ import { ArticleEditor } from '@/components/ArticleEditor'
 export default async function EditArticlePage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const articleId = parseInt(params.id)
+  const { id } = await params
+  const articleId = parseInt(id)
   const article = await getArticleById(articleId)
 
   if (!article) {

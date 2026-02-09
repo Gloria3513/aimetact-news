@@ -51,8 +51,9 @@ function renderMarkdown(content: string) {
   })
 }
 
-export default async function ArticlePage({ params }: { params: { id: string } }) {
-  const articleId = parseInt(params.id)
+export default async function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const articleId = parseInt(id)
 
   // 기사 가져오기
   const article = await getArticleById(articleId)
