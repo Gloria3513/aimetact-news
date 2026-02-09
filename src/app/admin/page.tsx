@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getArticles, deleteArticle } from '@/lib/articles'
 import type { Article } from '@/lib/types'
-import { Edit, Trash2, Eye, EyeOff, RefreshCw } from 'lucide-react'
+import { Edit, Trash2, Eye, EyeOff, RefreshCw, AlertTriangle } from 'lucide-react'
 
 export default function AdminPage() {
   const [articles, setArticles] = useState<Article[]>([])
@@ -67,6 +67,21 @@ export default function AdminPage() {
     }
   }
 
+  const handleDeleteAll = async () => {
+    if (!confirm('⚠️ 정말 모든 기사를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!')) return
+
+    const success = await fetch('/api/admin/articles/delete-all', {
+      method: 'DELETE',
+    }).then(res => res.ok)
+
+    if (success) {
+      alert('✅ 모든 기사가 삭제되었습니다.')
+      setArticles([])
+    } else {
+      alert('❌ 삭제 실패')
+    }
+  }
+
   const filteredArticles = articles.filter(a => {
     if (filter === 'published') return a.published
     if (filter === 'draft') return !a.published
@@ -87,6 +102,13 @@ export default function AdminPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">기사 관리</h1>
         <div className="flex gap-2">
+          <button
+            onClick={handleDeleteAll}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+          >
+            <AlertTriangle className="w-4 h-4" />
+            모두 삭제
+          </button>
           <button
             onClick={handleFetchNews}
             disabled={fetching}
