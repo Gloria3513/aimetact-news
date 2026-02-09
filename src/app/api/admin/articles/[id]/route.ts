@@ -4,13 +4,14 @@ import { updateArticle, getArticleById, deleteArticle } from '@/lib/articles'
 // PATCH - 기사 수정
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id } = await params
+    const articleId = parseInt(id)
     const body = await request.json()
 
-    const updated = await updateArticle(id, body)
+    const updated = await updateArticle(articleId, body)
 
     if (!updated) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
@@ -26,11 +27,12 @@ export async function PATCH(
 // DELETE - 기사 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
-    const success = await deleteArticle(id)
+    const { id } = await params
+    const articleId = parseInt(id)
+    const success = await deleteArticle(articleId)
 
     if (!success) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
