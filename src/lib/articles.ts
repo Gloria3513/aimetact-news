@@ -25,7 +25,7 @@ export async function getArticles(options?: {
   }
 
   if (options?.published !== undefined) {
-    query = query.filter('published', 'eq', options.published)
+    query = query.eq('published', options.published)
   }
 
   if (options?.limit) {
