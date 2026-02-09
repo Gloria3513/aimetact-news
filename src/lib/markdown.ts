@@ -82,5 +82,5 @@ export function renderMarkdown(content: string): React.ReactNode {
   // 남은 리스트 플러시
   flushList()
 
-  return <>{result}</>
+  return React.createElement(React.Fragment, null, ...result)
 }
