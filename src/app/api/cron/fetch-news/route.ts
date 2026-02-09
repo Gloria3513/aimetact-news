@@ -9,7 +9,44 @@ import { NextRequest, NextResponse } from 'next/server'
 import Parser from 'rss-parser'
 import { supabase } from '@/lib/supabase'
 
-const parser = new Parser()
+// Custom fields for media content (이미지 추출용)
+const parser = new Parser({
+  customFields: {
+    item: [
+      ['media:thumbnail', 'thumbnail'],
+      ['media:content', 'mediaContent'],
+      ['enclosure', 'enclosure'],
+    ],
+  },
+})
+
+// 이미지 URL 추출 함수
+function extractImageUrl(item: any): string | null {
+  // 1. enclosure에서 이미지 URL (Google News 주요 방식)
+  if (item.enclosure && item.enclosure.url && item.enclosure.type?.startsWith('image/')) {
+    return item.enclosure.url
+  }
+
+  // 2. media:thumbnail
+  if (item.thumbnail && item.thumbnail.$) {
+    return item.thumbnail.$.url
+  }
+
+  // 3. media:content
+  if (item.mediaContent && item.mediaContent.$) {
+    return item.mediaContent.$.url
+  }
+
+  // 4. Google News 특수: content 안에 이미지 태그
+  if (item.content) {
+    const imgMatch = item.content.match(/<img[^>]+src="([^"]+)"/)
+    if (imgMatch && imgMatch[1]) {
+      return imgMatch[1]
+    }
+  }
+
+  return null
+}
 
 // AI 교육 관련 키워드
 const AI_EDUCATION_KEYWORDS = [
@@ -143,6 +180,9 @@ export async function GET(request: NextRequest) {
             item.contentSnippet || ''
           )
 
+          // 이미지 URL 추출
+          const imageUrl = extractImageUrl(item)
+
           // 기사 저장
           const { error: insertError } = await supabase
             .from('articles')
@@ -154,7 +194,7 @@ export async function GET(request: NextRequest) {
               author: item.creator || item.author || 'Google News',
               tags: keywords,
               published: true, // 자동 수집 기사는 자동 발행
-              image_url: null,
+              image_url: imageUrl,
               views: 0,
             })
 
