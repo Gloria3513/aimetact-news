@@ -91,16 +91,26 @@ export default async function HomePage() {
             {/* 헤드라인 기사 */}
             <Link href={`/article/${articles[0].id}`} className="block mb-8">
               <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-video bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-700 to-teal-900 opacity-80"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white text-6xl font-bold tracking-tight">AI 교육</span>
-                  </div>
-                  {/* Decorative pattern */}
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-4 left-4 w-32 h-32 border-2 border-white rounded-full"></div>
-                    <div className="absolute bottom-4 right-4 w-24 h-24 border-2 border-white rounded-full"></div>
-                  </div>
+                <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-teal-600 to-teal-800">
+                  {articles[0].image_url ? (
+                    <img
+                      src={articles[0].image_url}
+                      alt={articles[0].title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-br from-teal-700 to-teal-900 opacity-80"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white text-6xl font-bold tracking-tight">AI 교육</span>
+                      </div>
+                      {/* Decorative pattern */}
+                      <div className="absolute inset-0 opacity-10">
+                        <div className="absolute top-4 left-4 w-32 h-32 border-2 border-white rounded-full"></div>
+                        <div className="absolute bottom-4 right-4 w-24 h-24 border-2 border-white rounded-full"></div>
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="p-6">
                   <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold mb-3">
@@ -126,9 +136,19 @@ export default async function HomePage() {
               {articles.slice(1).map((item) => (
                 <Link key={item.id} href={`/article/${item.id}`} className="block">
                   <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative overflow-hidden">
-                      <span className="text-slate-400 text-4xl font-bold">{item.category[0]}</span>
-                      <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-teal-100 opacity-30"></div>
+                    <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <>
+                          <span className="absolute inset-0 flex items-center justify-center text-slate-400 text-4xl font-bold">{item.category[0]}</span>
+                          <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-teal-100 opacity-30"></div>
+                        </>
+                      )}
                     </div>
                     <div className="p-5">
                       <span className="inline-block px-2 py-1 bg-teal-50 text-teal-700 rounded text-xs font-semibold mb-2">
