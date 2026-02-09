@@ -12,9 +12,12 @@ export async function getArticles(options?: {
   limit?: number
   offset?: number
 }): Promise<Article[]> {
+  // 캐시 방지를 위한 타임스탬프 추가
+  const cacheBuster = Date.now()
+
   let query = supabase
     .from('articles')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
 
   if (options?.category && options.category !== '전체') {
@@ -22,7 +25,7 @@ export async function getArticles(options?: {
   }
 
   if (options?.published !== undefined) {
-    query = query.eq('published', options.published)
+    query = query.filter('published', 'eq', options.published)
   }
 
   if (options?.limit) {
