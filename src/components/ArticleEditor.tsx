@@ -21,6 +21,7 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
     category: article?.category || 'AI교육',
     author: article?.author || '',
     tags: (article?.tags || []).join(', '),
+    image_url: article?.image_url || '',
     published: article?.published || false,
   })
 
@@ -99,6 +100,37 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
             placeholder="기사 요약을 입력하세요"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />
+        </div>
+
+        {/* 썸네일 이미지 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            썸네일 이미지 URL
+          </label>
+          <input
+            type="url"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleChange}
+            placeholder="https://example.com/image.jpg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+          />
+          {/* 이미지 미리보기 */}
+          {formData.image_url && (
+            <div className="mt-3">
+              <p className="text-xs text-gray-500 mb-2">미리보기:</p>
+              <div className="aspect-video w-full max-w-md rounded-lg overflow-hidden bg-gray-100">
+                <img
+                  src={formData.image_url}
+                  alt="썸네일 미리보기"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none'
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 카테고리 & 작성자 */}
