@@ -191,7 +191,7 @@ export async function GET(request: NextRequest) {
               content: item.contentSnippet || item.content || '',
               summary: generateSummary(item.contentSnippet || item.content || ''),
               category: category,
-              author: item.creator || item.author || 'Google News',
+              author: (item as any).creator || (item as any).author || 'Google News',
               tags: keywords,
               published: false, // 관리자 검토 후 발행
               image_url: imageUrl,
