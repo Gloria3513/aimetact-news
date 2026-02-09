@@ -24,9 +24,10 @@ interface SearchParams {
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }) {
-  const query = searchParams.q || ''
+  const params = await searchParams
+  const query = params.q || ''
 
   // 검색어가 없으면 빈 상태 표시
   if (!query) {
