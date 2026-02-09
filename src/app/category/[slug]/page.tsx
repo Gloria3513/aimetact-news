@@ -28,7 +28,14 @@ const categories = [
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const categorySlug = decodeURIComponent(slug)
-  const categoryName = categories.find(c => c.slug === categorySlug)?.name || categorySlug
+  const categoryObj = categories.find(c => c.slug === categorySlug)
+  const categoryName = categoryObj?.name || categorySlug
+
+  // 기사 가져오기
+  const articles = await getArticles({
+    category: categorySlug,
+    published: true
+  })
 
   return (
     <div className="min-h-screen bg-gray-50">
