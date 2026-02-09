@@ -52,7 +52,7 @@ export default async function HomePage() {
               {categories.map((cat) => (
                 <Link
                   key={cat}
-                  href={`/category/${cat === '전체' ? '' : cat}`}
+                  href={cat === '전체' ? '/' : `/category/${cat}`}
                   className="text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors"
                 >
                   {cat}
