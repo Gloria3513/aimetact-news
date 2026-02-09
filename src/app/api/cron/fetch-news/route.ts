@@ -67,15 +67,16 @@ const AI_EDUCATION_KEYWORDS = [
   'AI 소프트웨어 교육',
 ]
 
-// Google News RSS URL (AI 교육 관련)
-// 타임아웃 방지를 위해 2개만 사용
+// Google News RSS URL (AI 교육 관련 - 한국어만)
 const RSS_FEEDS = [
-  'https://news.google.com/rss/search?q=AI%20education&hl=en&gl=US&ceid=US:en',
-  'https://news.google.com/rss/search?q=artificial%20intelligence%20education&hl=en&gl=US&ceid=US:en',
+  'https://news.google.com/rss/search?q=AI%20%EA%B5%90%EC%9C%A1&hl=ko&gl=KR&ceid=KR:ko',
+  'https://news.google.com/rss/search?q=%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%20%EA%B5%90%EC%9C%A1&hl=ko&gl=KR&ceid=KR:ko',
+  'https://news.google.com/rss/search?q=AI%20%EC%9C%A0%EC%B9%98%EC%9B%90&hl=ko&gl=KR&ceid=KR:ko',
+  'https://news.google.com/rss/search?q=AI%20%EB%94%94%EC%A7%80%ED%84%9C%20%EA%B5%90%EA%B3%BC%EC%84%9C&hl=ko&gl=KR&ceid=KR:ko',
 ]
 
-// 테스트용: 최대 5개 기사만 수집
-const MAX_ARTICLES_PER_FEED = 5
+// 피드당 최대 기사 수
+const MAX_ARTICLES_PER_FEED = 10
 
 // 요약 생성 함수
 function generateSummary(content: string, maxLength = 200): string {
@@ -165,6 +166,14 @@ export async function GET(request: NextRequest) {
 
           if (existing) {
             console.log(`⏭️  중복 기사 건너뜀: ${item.title}`)
+            continue
+          }
+
+          // 한글 제목만 수집 (한글 문자 포함 확인)
+          const title = item.title || ''
+          const hasKorean = /[가-힣]/.test(title)
+          if (!hasKorean) {
+            console.log(`⏭️  한글 아닌 기사 건너뜀: ${title}`)
             continue
           }
 
