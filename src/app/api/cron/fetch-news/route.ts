@@ -31,16 +31,14 @@ const AI_EDUCATION_KEYWORDS = [
 ]
 
 // Google News RSS URL (AI 교육 관련)
-// URL 인코딩 적용
+// 타임아웃 방지를 위해 2개만 사용
 const RSS_FEEDS = [
-  'https://news.google.com/rss/search?q=AI%20%EA%B5%90%EC%9C%A1&hl=ko&gl=KR&ceid=KR:ko',
-  'https://news.google.com/rss/search?q=%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%20%EA%B5%90%EC%9C%A1&hl=ko&gl=KR&ceid=KR:ko',
-  'https://news.google.com/rss/search?q=AI%20%EC%9C%A0%EC%B9%98%EC%9B%90&hl=ko&gl=KR&ceid=KR:ko',
-  'https://news.google.com/rss/search?q=AI%20%EB%94%94%EC%A7%80%ED%84%9C%20%EA%B5%90%EA%B3%BC%EC%84%9C&hl=ko&gl=KR&ceid=KR:ko',
-  // 영어 키워드도 추가 (안정성 확보)
   'https://news.google.com/rss/search?q=AI%20education&hl=en&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=artificial%20intelligence%20education&hl=en&gl=US&ceid=US:en',
 ]
+
+// 테스트용: 최대 5개 기사만 수집
+const MAX_ARTICLES_PER_FEED = 5
 
 // 요약 생성 함수
 function generateSummary(content: string, maxLength = 200): string {
@@ -114,7 +112,11 @@ export async function GET(request: NextRequest) {
 
         if (!feed.items) continue
 
+        let articleCount = 0
         for (const item of feed.items) {
+          // 최대 개수 제한
+          if (articleCount >= MAX_ARTICLES_PER_FEED) break
+          articleCount++
           totalFetched++
 
           // 중복 체크 (제목으로)
