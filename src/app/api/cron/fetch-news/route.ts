@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
               category: category,
               author: item.creator || item.author || 'Google News',
               tags: keywords,
-              published: true, // 자동 수집 기사는 자동 발행
+              published: false, // 관리자 검토 후 발행
               image_url: imageUrl,
               views: 0,
             })

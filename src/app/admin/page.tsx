@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getArticles, deleteArticle } from '@/lib/articles'
 import type { Article } from '@/lib/types'
-import { Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Edit, Trash2, Eye, EyeOff, RefreshCw } from 'lucide-react'
 
 export default function AdminPage() {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetching, setFetching] = useState(false)
   const [filter, setFilter] = useState<'all' | 'published' | 'draft'>('all')
 
   useEffect(() => {
@@ -45,6 +46,27 @@ export default function AdminPage() {
     }
   }
 
+  const handleFetchNews = async () => {
+    if (!confirm('RSS에서 뉴스를 가져오시겠습니까?')) return
+
+    setFetching(true)
+    try {
+      const response = await fetch('/api/cron/fetch-news')
+      const result = await response.json()
+
+      if (result.success) {
+        alert(`✅ ${result.stats.totalSaved}개 기사를 가져왔습니다!`)
+        loadArticles()
+      } else {
+        alert(`❌ 오류: ${result.error || '알 수 없는 오류'}`)
+      }
+    } catch (error) {
+      alert('❌ 요청 실패')
+    } finally {
+      setFetching(false)
+    }
+  }
+
   const filteredArticles = articles.filter(a => {
     if (filter === 'published') return a.published
     if (filter === 'draft') return !a.published
@@ -64,12 +86,22 @@ export default function AdminPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">기사 관리</h1>
-        <Link
-          href="/admin/new"
-          className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors font-medium"
-        >
-          새 기사 작성
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={handleFetchNews}
+            disabled={fetching}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`w-4 h-4 ${fetching ? 'animate-spin' : ''}`} />
+            {fetching ? '가져오는 중...' : 'RSS 수집'}
+          </button>
+          <Link
+            href="/admin/new"
+            className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors font-medium"
+          >
+            새 기사 작성
+          </Link>
+        </div>
       </div>
 
       {/* 필터 */}
