@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Article } from '@/lib/types'
+import { Upload, X, Image as ImageIcon } from 'lucide-react'
 
 interface ArticleEditorProps {
   article?: Article
@@ -12,7 +13,9 @@ const categories = ['AI교육', '정책', '유치원', '학부모', '인터뷰']
 
 export function ArticleEditor({ article }: ArticleEditorProps) {
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   const [formData, setFormData] = useState({
     title: article?.title || '',
@@ -31,6 +34,41 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }))
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setFormData(prev => ({ ...prev, image_url: result.url }))
+      } else {
+        alert(result.error || '업로드 실패')
+      }
+    } catch (error) {
+      alert('업로드 실패')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setFormData(prev => ({ ...prev, image_url: '' }))
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,21 +143,60 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
         {/* 썸네일 이미지 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            썸네일 이미지 URL
+            썸네일 이미지
           </label>
-          <input
-            type="url"
-            name="image_url"
-            value={formData.image_url}
-            onChange={handleChange}
-            placeholder="https://example.com/image.jpg"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-          />
+
+          {/* 이미지 업로드 또는 URL 입력 */}
+          <div className="space-y-3">
+            {/* 업로드 영역 */}
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                <Upload className="w-4 h-4" />
+                {uploading ? '업로드 중...' : '이미지 업로드'}
+              </button>
+              {formData.image_url && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 rounded-lg text-red-700 text-sm font-medium transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  삭제
+                </button>
+              )}
+            </div>
+
+            {/* URL 입력 (대안) */}
+            <div className="relative">
+              <input
+                type="url"
+                name="image_url"
+                value={formData.image_url}
+                onChange={handleChange}
+                placeholder="또는 이미지 URL 직접 입력"
+                className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              />
+              <ImageIcon className="w-5 h-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
           {/* 이미지 미리보기 */}
           {formData.image_url && (
             <div className="mt-3">
               <p className="text-xs text-gray-500 mb-2">미리보기:</p>
-              <div className="aspect-video w-full max-w-md rounded-lg overflow-hidden bg-gray-100">
+              <div className="aspect-video w-full max-w-md rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                 <img
                   src={formData.image_url}
                   alt="썸네일 미리보기"
